@@ -7,18 +7,18 @@ import {
   ShoppingCart,
   ScanBarcode,
   FileText,
-  Newspaper,
-} from "lucide-react";
+  Newspaper } from
+"lucide-react";
 
 const navItems = [
-  { to: "/", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/productos", icon: Package, label: "Productos" },
-  { to: "/escaner", icon: ScanBarcode, label: "Escáner" },
-  { to: "/alertas", icon: AlertTriangle, label: "Alertas" },
-  { to: "/clasificacion", icon: BarChart3, label: "ABC" },
-  { to: "/ordenes", icon: ShoppingCart, label: "Órdenes" },
-  { to: "/reportes", icon: FileText, label: "Reportes" },
-];
+{ to: "/", icon: LayoutDashboard, label: "Dashboard" },
+{ to: "/productos", icon: Package, label: "Productos" },
+{ to: "/escaner", icon: ScanBarcode, label: "Escáner" },
+{ to: "/alertas", icon: AlertTriangle, label: "Alertas" },
+{ to: "/clasificacion", icon: BarChart3, label: "ABC" },
+{ to: "/ordenes", icon: ShoppingCart, label: "Órdenes" },
+{ to: "/reportes", icon: FileText, label: "Reportes" }];
+
 
 export default function AppSidebar() {
   const location = useLocation();
@@ -27,7 +27,7 @@ export default function AppSidebar() {
     <aside className="sidebar-gradient w-64 min-h-screen flex flex-col shrink-0">
       {/* Brand */}
       <div className="flex items-center gap-3 px-6 py-6 border-b border-sidebar-border">
-        <div className="w-9 h-9 rounded-lg bg-sidebar-primary flex items-center justify-center">
+        <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-[#97b1dd]">
           <Newspaper className="w-5 h-5 text-sidebar-primary-foreground" />
         </div>
         <div>
@@ -49,15 +49,15 @@ export default function AppSidebar() {
               key={item.to}
               to={item.to}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
-                active
-                  ? "bg-sidebar-accent text-sidebar-primary"
-                  : "text-sidebar-foreground/70 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/50"
-              }`}
-            >
+              active ?
+              "bg-sidebar-accent text-sidebar-primary" :
+              "text-sidebar-foreground/70 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/50"}`
+              }>
+
               <item.icon className={`w-[18px] h-[18px] ${active ? "text-sidebar-primary" : ""}`} />
               {item.label}
-            </NavLink>
-          );
+            </NavLink>);
+
         })}
       </nav>
 
@@ -73,6 +73,6 @@ export default function AppSidebar() {
           </div>
         </div>
       </div>
-    </aside>
-  );
+    </aside>);
+
 }
