@@ -12,6 +12,15 @@ export function addProduct(product: Product) {
   notify();
 }
 
+export function updateProductStock(productId: string, delta: number) {
+  globalProducts = globalProducts.map((p) =>
+    p.id === productId
+      ? { ...p, stockActual: Math.max(0, p.stockActual + delta), lastUpdated: new Date().toISOString().split("T")[0] }
+      : p
+  );
+  notify();
+}
+
 export function getProducts() {
   return globalProducts;
 }

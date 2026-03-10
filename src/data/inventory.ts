@@ -53,6 +53,7 @@ export const products: Product[] = [
   { id: "10", barcode: "7501001234576", name: "Metro", category: "Periódico Local", abcClass: "C", stockActual: 65, stockMinimo: 10, stockMaximo: 40, price: 10.00, supplier: "Distribuidora Local", lastUpdated: "2026-02-19" },
   { id: "11", barcode: "7501001234577", name: "El Sol de México", category: "Periódico Nacional", abcClass: "C", stockActual: 18, stockMinimo: 10, stockMaximo: 45, price: 15.00, supplier: "Distribuidora Centro", lastUpdated: "2026-02-19" },
   { id: "12", barcode: "7501001234578", name: "Proceso", category: "Revista", abcClass: "A", stockActual: 40, stockMinimo: 20, stockMaximo: 80, price: 55.00, supplier: "Distribuidora Especializada", lastUpdated: "2026-02-23" },
+  { id: "13", barcode: "KQ45010", name: "Edición Especial KQ", category: "Revista", abcClass: "B", stockActual: 25, stockMinimo: 10, stockMaximo: 60, price: 35.00, supplier: "Distribuidora Nacional", lastUpdated: "2026-03-10" },
 ];
 
 export const alerts: Alert[] = [

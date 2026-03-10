@@ -2,23 +2,27 @@ import { useState, useSyncExternalStore } from "react";
 import { ScanBarcode, Check, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getProducts, subscribeProducts } from "@/hooks/useProductStore";
+import { getProducts, subscribeProducts, updateProductStock } from "@/hooks/useProductStore";
 import AddProductDialog from "@/components/AddProductDialog";
+import MovementDialog from "@/components/MovementDialog";
+
 export default function Escaner() {
   const products = useSyncExternalStore(subscribeProducts, getProducts);
   const [barcode, setBarcode] = useState("");
-  const [found, setFound] = useState<typeof products[0] | null>(null);
+  const [foundId, setFoundId] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [scanned, setScanned] = useState(false);
 
+  const found = foundId ? products.find((p) => p.id === foundId) ?? null : null;
+
   const handleScan = () => {
-    const product = products.find(p => p.barcode === barcode);
+    const product = products.find((p) => p.barcode === barcode);
     if (product) {
-      setFound(product);
+      setFoundId(product.id);
       setNotFound(false);
       setScanned(true);
     } else if (barcode.length > 0) {
-      setFound(null);
+      setFoundId(null);
       setNotFound(true);
       setScanned(true);
     }
@@ -30,9 +34,13 @@ export default function Escaner() {
 
   const reset = () => {
     setBarcode("");
-    setFound(null);
+    setFoundId(null);
     setNotFound(false);
     setScanned(false);
+  };
+
+  const handleMovement = (qty: number) => {
+    if (found) updateProductStock(found.id, qty);
   };
 
   return (
@@ -61,7 +69,7 @@ export default function Escaner() {
 
           <div className="flex gap-2">
             <Input
-              placeholder="Ej: 7501001234567"
+              placeholder="Ej: 7501001234567 · KQ45010"
               value={barcode}
               onChange={(e) => { setBarcode(e.target.value); setScanned(false); }}
               onKeyDown={handleKeyDown}
@@ -72,7 +80,7 @@ export default function Escaner() {
           </div>
 
           <p className="text-[11px] text-muted-foreground mt-3">
-            Prueba con: 7501001234567 · 7501001234574
+            Prueba con: 7501001234567 · 7501001234574 · KQ45010
           </p>
         </div>
 
@@ -89,7 +97,8 @@ export default function Escaner() {
             </div>
             <div className="flex gap-2 mt-4">
               <Button size="sm" variant="outline" onClick={reset}>Escanear otro</Button>
-              <Button size="sm"><Plus className="w-4 h-4 mr-1" /> Registrar entrada</Button>
+              <MovementDialog product={found} type="entrada" onRegistered={handleMovement} />
+              <MovementDialog product={found} type="salida" onRegistered={handleMovement} />
             </div>
           </div>
         )}
