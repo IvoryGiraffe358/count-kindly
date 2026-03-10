@@ -1,22 +1,26 @@
+import { useSyncExternalStore } from "react";
 import { Package, AlertTriangle, TrendingUp, ShoppingCart, ArrowDownRight, ArrowUpRight } from "lucide-react";
 import MetricCard from "@/components/MetricCard";
 import StatusBadge from "@/components/StatusBadge";
 import AbcBadge from "@/components/AbcBadge";
-import { products, alerts, movements, getStockStatus, getAbcStats } from "@/data/inventory";
+import { alerts, getStockStatus, getAbcStats } from "@/data/inventory";
+import { getProducts, getMovements, subscribeProducts } from "@/hooks/useProductStore";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
-const abcData = getAbcStats(products);
-const totalStock = products.reduce((sum, p) => sum + p.stockActual, 0);
-const lowStockCount = products.filter(p => {
-  const s = getStockStatus(p);
-  return s === "low" || s === "critical";
-}).length;
-const unreadAlerts = alerts.filter(a => !a.read).length;
-
 export default function Dashboard() {
+  const products = useSyncExternalStore(subscribeProducts, getProducts);
+  const movements = useSyncExternalStore(subscribeProducts, getMovements);
+
+  const abcData = getAbcStats(products);
+  const totalStock = products.reduce((sum, p) => sum + p.stockActual, 0);
+  const lowStockCount = products.filter(p => {
+    const s = getStockStatus(p);
+    return s === "low" || s === "critical";
+  }).length;
+  const unreadAlerts = alerts.filter(a => !a.read).length;
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -24,7 +28,6 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard title="Total Productos" value={products.length} subtitle="de 500 capacidad" icon={Package} />
         <MetricCard title="Stock Total" value={totalStock.toLocaleString()} subtitle="unidades en inventario" icon={TrendingUp} variant="accent" />
@@ -33,7 +36,6 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* ABC Chart */}
         <div className="bg-card rounded-lg border border-border p-5 animate-fade-in">
           <h2 className="text-sm font-semibold text-foreground mb-4">Clasificación ABC</h2>
           <div className="h-48">
@@ -44,14 +46,7 @@ export default function Dashboard() {
                     <Cell key={i} fill={entry.fill} />
                   ))}
                 </Pie>
-                <Tooltip
-                  contentStyle={{
-                    background: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                    fontSize: "12px",
-                  }}
-                />
+                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -65,7 +60,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Alerts */}
         <div className="bg-card rounded-lg border border-border p-5 animate-fade-in">
           <h2 className="text-sm font-semibold text-foreground mb-4">Alertas Recientes</h2>
           <div className="space-y-3">
@@ -81,7 +75,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Movements */}
         <div className="bg-card rounded-lg border border-border p-5 animate-fade-in">
           <h2 className="text-sm font-semibold text-foreground mb-4">Movimientos Recientes</h2>
           <div className="space-y-3">
@@ -105,7 +98,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Quick Product Overview */}
       <div className="bg-card rounded-lg border border-border p-5 animate-fade-in">
         <h2 className="text-sm font-semibold text-foreground mb-4">Productos con Atención Requerida</h2>
         <div className="overflow-x-auto">

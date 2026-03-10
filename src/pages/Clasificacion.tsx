@@ -1,22 +1,25 @@
-import { products, getAbcStats } from "@/data/inventory";
+import { useSyncExternalStore } from "react";
+import { getAbcStats } from "@/data/inventory";
+import { getProducts, subscribeProducts } from "@/hooks/useProductStore";
 import AbcBadge from "@/components/AbcBadge";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-
-const abcData = getAbcStats(products);
-
-const classAProducts = products.filter(p => p.abcClass === "A");
-const classBProducts = products.filter(p => p.abcClass === "B");
-const classCProducts = products.filter(p => p.abcClass === "C");
-
-const valueByClass = [
-  { name: "Clase A", value: classAProducts.reduce((s, p) => s + p.stockActual * p.price, 0) },
-  { name: "Clase B", value: classBProducts.reduce((s, p) => s + p.stockActual * p.price, 0) },
-  { name: "Clase C", value: classCProducts.reduce((s, p) => s + p.stockActual * p.price, 0) },
-];
 
 const fills = ["hsl(var(--chart-a))", "hsl(var(--chart-b))", "hsl(var(--chart-c))"];
 
 export default function Clasificacion() {
+  const products = useSyncExternalStore(subscribeProducts, getProducts);
+
+  const abcData = getAbcStats(products);
+  const classAProducts = products.filter(p => p.abcClass === "A");
+  const classBProducts = products.filter(p => p.abcClass === "B");
+  const classCProducts = products.filter(p => p.abcClass === "C");
+
+  const valueByClass = [
+    { name: "Clase A", value: classAProducts.reduce((s, p) => s + p.stockActual * p.price, 0) },
+    { name: "Clase B", value: classBProducts.reduce((s, p) => s + p.stockActual * p.price, 0) },
+    { name: "Clase C", value: classCProducts.reduce((s, p) => s + p.stockActual * p.price, 0) },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -25,7 +28,6 @@ export default function Clasificacion() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Pie */}
         <div className="bg-card rounded-lg border border-border p-5 animate-fade-in">
           <h2 className="text-sm font-semibold text-foreground mb-4">Distribución por Cantidad</h2>
           <div className="h-56">
@@ -40,7 +42,6 @@ export default function Clasificacion() {
           </div>
         </div>
 
-        {/* Bar */}
         <div className="bg-card rounded-lg border border-border p-5 animate-fade-in">
           <h2 className="text-sm font-semibold text-foreground mb-4">Valor en Inventario ($)</h2>
           <div className="h-56">
@@ -59,7 +60,6 @@ export default function Clasificacion() {
         </div>
       </div>
 
-      {/* Tables by class */}
       {[
         { label: "Clase A", desc: "Alto valor · Control estricto", items: classAProducts },
         { label: "Clase B", desc: "Valor medio · Control moderado", items: classBProducts },

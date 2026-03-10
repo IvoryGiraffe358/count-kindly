@@ -1,18 +1,23 @@
-import { products, movements, getStockStatus } from "@/data/inventory";
+import { useSyncExternalStore } from "react";
+import { getStockStatus } from "@/data/inventory";
+import { getProducts, getMovements, subscribeProducts } from "@/hooks/useProductStore";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-const stockByCategory = Object.entries(
-  products.reduce<Record<string, number>>((acc, p) => {
-    acc[p.category] = (acc[p.category] || 0) + p.stockActual;
-    return acc;
-  }, {})
-).map(([name, value]) => ({ name, value }));
-
-const totalValue = products.reduce((s, p) => s + p.stockActual * p.price, 0);
-const lowStock = products.filter(p => getStockStatus(p) === "low" || getStockStatus(p) === "critical").length;
-const excessStock = products.filter(p => getStockStatus(p) === "excess").length;
-
 export default function Reportes() {
+  const products = useSyncExternalStore(subscribeProducts, getProducts);
+  const movements = useSyncExternalStore(subscribeProducts, getMovements);
+
+  const stockByCategory = Object.entries(
+    products.reduce<Record<string, number>>((acc, p) => {
+      acc[p.category] = (acc[p.category] || 0) + p.stockActual;
+      return acc;
+    }, {})
+  ).map(([name, value]) => ({ name, value }));
+
+  const totalValue = products.reduce((s, p) => s + p.stockActual * p.price, 0);
+  const lowStock = products.filter(p => getStockStatus(p) === "low" || getStockStatus(p) === "critical").length;
+  const excessStock = products.filter(p => getStockStatus(p) === "excess").length;
+
   return (
     <div className="space-y-6">
       <div>
@@ -20,7 +25,6 @@ export default function Reportes() {
         <p className="text-sm text-muted-foreground mt-1">Resumen general del inventario</p>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-card rounded-lg border border-border p-5 animate-fade-in">
           <p className="text-xs text-muted-foreground uppercase tracking-wider">Valor Total Inventario</p>
@@ -36,7 +40,6 @@ export default function Reportes() {
         </div>
       </div>
 
-      {/* Chart */}
       <div className="bg-card rounded-lg border border-border p-5 animate-fade-in">
         <h2 className="text-sm font-semibold text-foreground mb-4">Stock por Categoría</h2>
         <div className="h-64">
@@ -52,7 +55,6 @@ export default function Reportes() {
         </div>
       </div>
 
-      {/* Movements Log */}
       <div className="bg-card rounded-lg border border-border p-5 animate-fade-in">
         <h2 className="text-sm font-semibold text-foreground mb-4">Últimos Movimientos</h2>
         <table className="w-full text-sm">
