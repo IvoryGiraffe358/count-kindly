@@ -13,16 +13,16 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Product } from "@/data/inventory";
+import { updateProductStock } from "@/hooks/useProductStore";
 import { toast } from "sonner";
 
 interface MovementDialogProps {
   product: Product;
   type: "entrada" | "salida";
-  onRegistered?: (quantity: number) => void;
   trigger?: React.ReactNode;
 }
 
-export default function MovementDialog({ product, type, onRegistered, trigger }: MovementDialogProps) {
+export default function MovementDialog({ product, type, trigger }: MovementDialogProps) {
   const [open, setOpen] = useState(false);
   const [quantity, setQuantity] = useState("");
   const [user, setUser] = useState("");
@@ -46,7 +46,8 @@ export default function MovementDialog({ product, type, onRegistered, trigger }:
       return;
     }
 
-    onRegistered?.(isEntrada ? qty : -qty);
+    const delta = isEntrada ? qty : -qty;
+    updateProductStock(product.id, delta, user.trim());
     toast.success(
       `${isEntrada ? "Entrada" : "Salida"} de ${qty} unidades de "${product.name}" registrada.`
     );
@@ -81,6 +82,7 @@ export default function MovementDialog({ product, type, onRegistered, trigger }:
           <div className="space-y-1.5">
             <Label htmlFor="qty">Cantidad *</Label>
             <Input id="qty" type="number" min="1" placeholder="Ej: 50" value={quantity} onChange={(e) => setQuantity(e.target.value)} autoFocus />
+            <p className="text-[11px] text-muted-foreground">Puedes ingresar cualquier cantidad (ej: 1, 50, 200)</p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="user">Responsable *</Label>
