@@ -1,11 +1,18 @@
-import { useState } from "react";
-import { Search } from "lucide-react";
+import { useState, useSyncExternalStore } from "react";
+import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { products, getStockStatus } from "@/data/inventory";
+import { getStockStatus } from "@/data/inventory";
+import { getProducts } from "@/hooks/useProductStore";
 import StatusBadge from "@/components/StatusBadge";
 import AbcBadge from "@/components/AbcBadge";
+import AddProductDialog from "@/components/AddProductDialog";
+
+let listeners: Array<() => void> = [];
+function subscribe(cb: () => void) { listeners.push(cb); return () => { listeners = listeners.filter(l => l !== cb); }; }
+function getSnapshot() { return getProducts(); }
 
 export default function Productos() {
+  const products = useSyncExternalStore(subscribe, getSnapshot);
   const [search, setSearch] = useState("");
 
   const filtered = products.filter(p =>
@@ -21,14 +28,17 @@ export default function Productos() {
           <h1 className="text-2xl font-bold text-foreground">Productos</h1>
           <p className="text-sm text-muted-foreground mt-1">{products.length} productos registrados</p>
         </div>
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por nombre o código..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
+        <div className="flex items-center gap-3">
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nombre o código..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <AddProductDialog />
         </div>
       </div>
 

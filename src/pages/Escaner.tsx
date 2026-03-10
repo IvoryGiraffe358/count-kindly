@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { ScanBarcode, Check, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { products } from "@/data/inventory";
+import { getProducts } from "@/hooks/useProductStore";
+import AddProductDialog from "@/components/AddProductDialog";
+
+// Subscribe to product store
+let listeners: Array<() => void> = [];
+function subscribe(cb: () => void) { listeners.push(cb); return () => { listeners = listeners.filter(l => l !== cb); }; }
+function getSnapshot() { return getProducts(); }
 
 export default function Escaner() {
+  const products = useSyncExternalStore(subscribe, getSnapshot);
   const [barcode, setBarcode] = useState("");
   const [found, setFound] = useState<typeof products[0] | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -36,13 +43,15 @@ export default function Escaner() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Escáner de Código de Barras</h1>
-        <p className="text-sm text-muted-foreground mt-1">Escanea o ingresa un código para buscar/registrar productos</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Escáner de Código de Barras</h1>
+          <p className="text-sm text-muted-foreground mt-1">Escanea o ingresa un código para buscar/registrar productos</p>
+        </div>
+        <AddProductDialog />
       </div>
 
       <div className="max-w-lg mx-auto">
-        {/* Scanner Input Area */}
         <div className="bg-card rounded-lg border border-border p-8 text-center animate-fade-in">
           <div className={`w-20 h-20 rounded-2xl mx-auto mb-6 flex items-center justify-center transition-all duration-300 ${scanned && found ? "bg-success/10" : "bg-accent/10 animate-pulse-glow"}`}>
             {scanned && found ? (
@@ -73,7 +82,6 @@ export default function Escaner() {
           </p>
         </div>
 
-        {/* Result */}
         {found && (
           <div className="bg-card rounded-lg border border-success/30 p-6 mt-4 animate-fade-in">
             <h3 className="font-semibold text-foreground mb-3">✓ Producto Encontrado</h3>
@@ -95,10 +103,18 @@ export default function Escaner() {
         {notFound && (
           <div className="bg-card rounded-lg border border-destructive/30 p-6 mt-4 animate-fade-in">
             <h3 className="font-semibold text-destructive mb-2">Producto no encontrado</h3>
-            <p className="text-sm text-muted-foreground">El código "{barcode}" no está registrado en el sistema.</p>
-            <div className="flex gap-2 mt-4">
+            <p className="text-sm text-muted-foreground mb-4">El código "{barcode}" no está registrado en el sistema.</p>
+            <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={reset}>Intentar otro</Button>
-              <Button size="sm"><Plus className="w-4 h-4 mr-1" /> Registrar nuevo producto</Button>
+              <AddProductDialog
+                defaultBarcode={barcode}
+                onAdded={reset}
+                trigger={
+                  <Button size="sm">
+                    <Plus className="w-4 h-4 mr-1" /> Registrar nuevo producto
+                  </Button>
+                }
+              />
             </div>
           </div>
         )}
