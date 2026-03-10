@@ -4,11 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getProducts, subscribeProducts } from "@/hooks/useProductStore";
 import AddProductDialog from "@/components/AddProductDialog";
-function subscribe(cb: () => void) { listeners.push(cb); return () => { listeners = listeners.filter(l => l !== cb); }; }
-function getSnapshot() { return getProducts(); }
-
 export default function Escaner() {
-  const products = useSyncExternalStore(subscribe, getSnapshot);
+  const products = useSyncExternalStore(subscribeProducts, getProducts);
   const [barcode, setBarcode] = useState("");
   const [found, setFound] = useState<typeof products[0] | null>(null);
   const [notFound, setNotFound] = useState(false);
