@@ -2,11 +2,8 @@ import { useState, useSyncExternalStore } from "react";
 import { ScanBarcode, Check, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getProducts } from "@/hooks/useProductStore";
+import { getProducts, subscribeProducts } from "@/hooks/useProductStore";
 import AddProductDialog from "@/components/AddProductDialog";
-
-// Subscribe to product store
-let listeners: Array<() => void> = [];
 function subscribe(cb: () => void) { listeners.push(cb); return () => { listeners = listeners.filter(l => l !== cb); }; }
 function getSnapshot() { return getProducts(); }
 
