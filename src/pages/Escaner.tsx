@@ -2,7 +2,7 @@ import { useState, useSyncExternalStore } from "react";
 import { ScanBarcode, Check, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getProducts, subscribeProducts, updateProductStock } from "@/hooks/useProductStore";
+import { getProducts, subscribeProducts } from "@/hooks/useProductStore";
 import AddProductDialog from "@/components/AddProductDialog";
 import MovementDialog from "@/components/MovementDialog";
 
@@ -37,10 +37,6 @@ export default function Escaner() {
     setFoundId(null);
     setNotFound(false);
     setScanned(false);
-  };
-
-  const handleMovement = (qty: number) => {
-    if (found) updateProductStock(found.id, qty);
   };
 
   return (
@@ -97,8 +93,8 @@ export default function Escaner() {
             </div>
             <div className="flex gap-2 mt-4">
               <Button size="sm" variant="outline" onClick={reset}>Escanear otro</Button>
-              <MovementDialog product={found} type="entrada" onRegistered={handleMovement} />
-              <MovementDialog product={found} type="salida" onRegistered={handleMovement} />
+              <MovementDialog product={found} type="entrada" />
+              <MovementDialog product={found} type="salida" />
             </div>
           </div>
         )}
